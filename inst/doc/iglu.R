@@ -22,6 +22,15 @@ data("example_data_5_subject")
 dim(example_data_5_subject)
 str(example_data_5_subject)
 
+## ---- eval=FALSE--------------------------------------------------------------
+#  read_raw_data("mydexcomdata.csv", sensor = "dexcom", id = "read")
+
+## ---- eval = FALSE------------------------------------------------------------
+#  process_data(example_data_5_subject, id = "id", timestamp = "time", glu = "gl")
+
+## ---- eval = FALSE------------------------------------------------------------
+#  process_data(data, id = "id", timestamp = "time", glu = "gl", time_parser = function(time_string) {strptime(time_string, format = "%d/%m/%Y %H:%M")})
+
 ## -----------------------------------------------------------------------------
 above_percent(example_data_1_subject)
 
@@ -30,9 +39,6 @@ above_percent(example_data_1_subject$gl)
 
 ## -----------------------------------------------------------------------------
 above_percent(example_data_1_subject, targets = c(100, 200, 300))
-
-## -----------------------------------------------------------------------------
-mage(example_data_5_subject)
 
 ## -----------------------------------------------------------------------------
 hyper_index(example_data_5_subject)
@@ -52,6 +58,24 @@ conga(example_data_1_subject, tz = 'EST')
 ## ---- cache = T---------------------------------------------------------------
 sd_measures(example_data_5_subject)
 
+## -----------------------------------------------------------------------------
+calculate_sleep_wake(example_data_1_subject, sd_glu, calculate = "sleep")
+
+## -----------------------------------------------------------------------------
+calculate_sleep_wake(example_data_5_subject, sd_measures, sleep_start = 2, sleep_end = 8, calculate = "sleep")
+
+## -----------------------------------------------------------------------------
+calculate_sleep_wake(example_data_5_subject, grade, sleep_start = 23, sleep_end = 7, calculate = "wake")
+
+## -----------------------------------------------------------------------------
+calculate_sleep_wake(example_data_5_subject, gmi, calculate = "both")
+
+## -----------------------------------------------------------------------------
+calculate_sleep_wake(example_data_5_subject, cogi, calculate = "sleep", targets = c(80, 150), weights = c(.3,.2,.5))
+
+## -----------------------------------------------------------------------------
+calculate_sleep_wake(example_data_5_subject, grade_eugly, sleep_start = 1, sleep_end = 9, calculate = "both", lower = 80, upper = 150)
+
 ## ---- fig.width = 7-----------------------------------------------------------
 plot_glu(example_data_1_subject, plottype = 'tsplot', tz = "EST")
 plot_glu(example_data_5_subject, plottype = 'tsplot', tz = "EST")
@@ -61,40 +85,6 @@ plot_glu(example_data_5_subject, plottype = 'tsplot', subjects = 'Subject 3', tz
 
 ## ---- fig.width = 7-----------------------------------------------------------
 plot_glu(example_data_5_subject, plottype = 'tsplot', subjects = 'Subject 3', LLTR = 80, ULTR = 150, tz = "EST")
-
-## ---- cache = T, fig.width = 7------------------------------------------------
-plot_glu(example_data_5_subject, plottype = 'lasagna', tz = 'EST')
-
-## ---- cache = T, fig.width = 7------------------------------------------------
-plot_glu(example_data_5_subject, plottype = 'lasagna', datatype = 'average', tz = 'EST')
-
-## ---- cache = T, fig.width = 7------------------------------------------------
-plot_glu(example_data_5_subject, plottype = 'lasagna', datatype = 'average', lasagnatype = 'timesorted', tz = 'EST')
-
-## ---- cache = T, fig.width = 7------------------------------------------------
-plot_glu(example_data_1_subject, plottype = 'lasagna', datatype = 'single', lasagnatype = 'unsorted', tz = 'EST')
-
-## ---- cache = T, fig.width = 7------------------------------------------------
-plot_glu(example_data_1_subject, plottype = 'lasagna', datatype = 'single', lasagnatype = 'timesorted', tz = 'EST')
-
-
-## ---- cache = T, fig.width = 7------------------------------------------------
-plot_lasagna(example_data_5_subject, datatype = 'average', lasagnatype = 'subjectsorted', tz = 'EST')
-
-## ---- cache = T, fig.width = 7------------------------------------------------
-plot_lasagna(example_data_5_subject, datatype = 'average', lasagnatype = 'subjectsorted', LLTR = 100, ULTR = 180, midpoint = 150, limits = c(80, 500), tz = 'EST')
-
-## ---- cache = T, fig.width = 7------------------------------------------------
-plot_lasagna_1subject(example_data_1_subject, lasagnatype = 'unsorted', tz = 'EST')
-
-## ---- cache = T, fig.width = 7------------------------------------------------
-plot_lasagna_1subject(example_data_1_subject, lasagnatype = 'timesorted', tz = 'EST')
-
-## ---- cache = T, fig.width = 7------------------------------------------------
-plot_lasagna_1subject(example_data_1_subject, lasagnatype = 'daysorted', tz = 'EST')
-
-## ---- cache = T, fig.width = 7------------------------------------------------
-plot_lasagna_1subject(example_data_1_subject, lasagnatype = 'daysorted', midpoint = 150, limits = c(80,500), tz = 'EST')
 
 ## ---- cache = T, fig.width = 7------------------------------------------------
 plot_roc(example_data_5_subject, subjects = c("Subject 1", "Subject 5"))
