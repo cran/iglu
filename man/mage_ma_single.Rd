@@ -7,11 +7,12 @@
 mage_ma_single(
   data,
   short_ma = 5,
-  long_ma = 23,
+  long_ma = 32,
   type = c("auto", "plus", "minus"),
   plot = FALSE,
-  interval = NA,
-  dateformat = "\%Y-\%m-\%d \%H:\%M:\%S",
+  dt0 = NULL,
+  inter_gap = 45,
+  tz = "",
   title = NA,
   xlab = NA,
   ylab = NA,
@@ -19,19 +20,21 @@ mage_ma_single(
 )
 }
 \arguments{
-\item{data}{Data Frame object with column names "id", "time", and "gl" OR numeric vector of glucose values (plot won't work with vector)}
+\item{data}{DataFrame object with column names "id", "time", and "gl". Should only be data for 1 subject. In case multiple subject ids are detected, the warning is produced and only 1st subject is used.}
 
-\item{short_ma}{Integer for period length of the short moving average. Must be positive and less than "long_ma". (Recommended <15)}
+\item{short_ma}{Integer for period length of the short moving average. Must be positive and less than "long_ma", default value is 5. (Recommended <15)}
 
-\item{long_ma}{Integer for period length for the long moving average. (Recommended >20)}
+\item{long_ma}{Integer for period length for the long moving average, default value is 32. (Recommended >20)}
 
 \item{type}{One of "plus", "minus", "auto" (Default: auto). Algorithm will either calculate MAGE+ (nadir to peak), MAGE- (peak to nadir), or automatically choose based on the first countable excursion.}
 
 \item{plot}{Boolean. Returns ggplot if TRUE.}
 
-\item{interval}{Integer for time interval in minutes between glucose readings. Function will auto-magically determine the interval if not specified. (Only used to calculate the gaps shown on the ggplot)}
+\item{dt0}{The time frequency for interpolation in minutes, the default will match the CGM meter's frequency (e.g. 5 min for Dexcom).}
 
-\item{dateformat}{POSIXct time format for time of glucose readings. Highly recommended to set if glucose times are in a different format.}
+\item{inter_gap}{The maximum allowable gap (in minutes) for interpolation. The values will not be interpolated between the glucose measurements that are more than inter_gap minutes apart. The default value is 45 min.}
+
+\item{tz}{A character string specifying the time zone to be used. System-specific (see \code{\link{as.POSIXct}}), but " " is the current time zone, and "GMT" is UTC (Universal Time, Coordinated). Invalid values are most commonly treated as UTC, on some platforms with a warning.}
 
 \item{title}{Title for the ggplot. Defaults to "Glucose Trace - Subject [ID]"}
 
@@ -51,21 +54,20 @@ This function is an internal function used by "mage". The function will calculat
 See "mage".
 }
 \examples{
-data(example_data_5_subject)
+data(example_data_1_subject)
 mage_ma_single(
-   example_data_5_subject,
+   example_data_1_subject,
    short_ma = 4,
    long_ma = 24,
    type = 'plus')
 
 mage_ma_single(
-   example_data_5_subject,
-   dateformat="\%m-\%d-\%Y \%H:\%M:\%S")
+   example_data_1_subject,
+   inter_gap = 300)
 
 mage_ma_single(
-   example_data_5_subject,
+   example_data_1_subject,
    plot=TRUE,
-   interval=15,
    title="Patient X",
    xlab="Time",
    ylab="Glucose Level (mg/dL)",

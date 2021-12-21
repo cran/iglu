@@ -1,3 +1,14 @@
+# iglu 3.2.0
+* MAGE vignette
+* MAGE default parameters for short and long moving averages are automatically adjusted in case of short length of glucose trace
+* MAGE automatically adapts to given meter frequency
+
+# iglu 3.2.0
+* Add automatic filtering and warning in case multiple measurements for one subject at the same time stamp
+* Add automatic sorting of time before calculating MAGE
+* Allow to change some of the default parameters when calculatin metrics with all_metrics
+
+
 # iglu 3.1.0
 * Minor bug corrections to shiny app
 * Correct bug wtih reading raw data from iglu pro
