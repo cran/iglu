@@ -15,7 +15,7 @@
 #' epicalc_profile(example_data_1_subject)
 #'
 
-epicalc_profile <- function(data,lv1_hypo=100,lv2_hypo=70,lv1_hyper=120,lv2_hyper=160,color_scheme="Color Scheme 1"){
+epicalc_profile <- function(data,lv1_hypo=100,lv2_hypo=70,lv1_hyper=120,lv2_hyper=160,color_scheme="Color Scheme 1", dur_length=15){
 
   #Clean up Global environment
   id = NULL
@@ -41,7 +41,7 @@ epicalc_profile <- function(data,lv1_hypo=100,lv2_hypo=70,lv1_hyper=120,lv2_hype
 
 
   #Calling episode_calculation for data
-  epicalc = episode_calculation(data, lv1_hypo, lv2_hypo, lv1_hyper, lv2_hyper)
+  epicalc = episode_calculation(data, lv1_hypo, lv2_hypo, lv1_hyper, lv2_hyper, dur_length)
 
   #Checking for multiple subjects
   subject = unique(data$id)

@@ -30,7 +30,7 @@ read_df_or_vec <- function(data, id = 'id', time = 'time', gl = 'gl'){
   if(class(data) %in% c('numeric', 'integer', 'double')){
     output = as.double(data)
   }
-  else if(class(data) == 'data.frame'){
+  else if(inherits(data, "data.frame")){
     indexes = which(names(data) %in% c(id, time, gl))
     if(length(indexes) < 3){
       stop("If passing a dataframe, make sure there are columns corresponding to id, time, and gl glucose values. At least one of
@@ -74,6 +74,11 @@ read_df_or_vec <- function(data, id = 'id', time = 'time', gl = 'gl'){
 #'
 CGMS2DayByDay <- function(data, dt0 = NULL, inter_gap = 45, tz = ""){
 
+  # complete.cases only works with POSIXct, not POSIXlt, so check for correct time format
+  if (!lubridate::is.POSIXct(data$time)){
+    tr = as.character(data$time)
+    data$time = as.POSIXct(tr, format='%Y-%m-%d %H:%M:%S', tz = tz)
+  }
   data = data[complete.cases(data),]
 
   ns = length(unique(data$id))

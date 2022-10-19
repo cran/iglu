@@ -14,19 +14,16 @@
 
 <title>List of metrics implemented in iglu</title>
 
-<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
-// v0.0.1
-// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
-
-document.addEventListener('DOMContentLoaded', function() {
-  const codeList = document.getElementsByClassName("sourceCode");
-  for (var i = 0; i < codeList.length; i++) {
-    var linkList = codeList[i].getElementsByTagName('a');
-    for (var j = 0; j < linkList.length; j++) {
-      if (linkList[j].innerHTML === "") {
-        linkList[j].setAttribute('aria-hidden', 'true');
-      }
-    }
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
   }
 });
 </script>
@@ -39,6 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
     </style>
+
 
 
 
@@ -243,10 +241,10 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <table>
 <colgroup>
-<col width="18%"></col>
-<col width="46%"></col>
-<col width="15%"></col>
-<col width="18%"></col>
+<col width="18%" />
+<col width="46%" />
+<col width="15%" />
+<col width="18%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -260,55 +258,78 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <tr class="odd">
 <td align="left">Active Percent</td>
 <td align="center">active_percent</td>
-<td align="left"><a href="https://doi.org/10.2337/dc17-1600">Danne et al. (2017)</a></td>
+<td align="left"><a href="https://doi.org/10.2337/dc17-1600">Danne et
+al. (2017)</a></td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">ADRR (Average Daily Risk Range)</td>
 <td align="center">adrr</td>
-<td align="left"><a href="https://doi.org/10.2337/dc06-1085">Kovatchev et al. (2006)</a></td>
+<td align="left"><a href="https://doi.org/10.2337/dc06-1085">Kovatchev
+et al. (2006)</a></td>
 <td align="left">Yes</td>
 </tr>
 <tr class="odd">
 <td align="left">AUC (Area Under the Curve)</td>
 <td align="center">auc</td>
-<td align="left"><a href="https://doi.org/10.2337/dc17-1600">Danne et al. (2017)</a></td>
+<td align="left"><a href="https://doi.org/10.2337/dc17-1600">Danne et
+al. (2017)</a></td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">COGI (COntinuous Glucose monitoring Index)</td>
 <td align="center">cogi</td>
-<td align="left"><a href="https://doi.org/10.1177/1932296819838525">Leelarathna et al. (2019)</a></td>
+<td align="left"><a href="https://doi.org/10.1177/1932296819838525">Leelarathna et
+al. (2019)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">CONGA (Continuous Overall Net Glycemic Action)</td>
 <td align="center">conga</td>
-<td align="left"><a href="https://doi.org/10.1089/dia.2005.7.253">McDonnell et al. (2005)</a></td>
+<td align="left"><a href="https://doi.org/10.1089/dia.2005.7.253">McDonnell et
+al. (2005)</a></td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">Coefficient of variation (CV)</td>
 <td align="center">cv_glu</td>
-<td align="left"><a href="https://doi.org/10.1089/dia.2008.0132">Rodbard (2009)</a></td>
+<td align="left"><a href="https://doi.org/10.1089/dia.2008.0132">Rodbard
+(2009)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">CVmean (mean of daily CV)</td>
 <td align="center">cv_measures (CVmean)</td>
-<td align="left"><a href="https://doi.org/10.1016/j.amjms.2018.09.010">Umpierrez et al. (2018)</a></td>
+<td align="left"><a href="https://doi.org/10.1016/j.amjms.2018.09.010">Umpierrez et
+al. (2018)</a></td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">CVsd (SD of daily CV)</td>
 <td align="center">cv_measures (CVsd)</td>
-<td align="left"><a href="https://doi.org/10.1016/j.amjms.2018.09.010">Umpierrez et al. (2018)</a></td>
+<td align="left"><a href="https://doi.org/10.1016/j.amjms.2018.09.010">Umpierrez et
+al. (2018)</a></td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">Delta G (meal metric)</td>
+<td align="center">meal_metrics</td>
+<td align="left"><a href="https://doi.org/10.2337/db12-1396">Service
+(2013)</a></td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
+<td align="left">Delta T (meal metric)</td>
+<td align="center">meal_metrics</td>
+<td align="left"><a href="https://doi.org/10.2337/db12-1396">Service
+(2013)</a></td>
 <td align="left">Yes</td>
 </tr>
 <tr class="odd">
 <td align="left">eA1c (Estimated A1c)</td>
 <td align="center">ea1c</td>
-<td align="left"><a href="https://doi.org/10.2337/dc08-0545">Nathan et. al (2008)</a></td>
+<td align="left"><a href="https://doi.org/10.2337/dc08-0545">Nathan et.
+al (2008)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="even">
@@ -326,67 +347,78 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <tr class="even">
 <td align="left">Glucose Management Indicator (GMI)</td>
 <td align="center">gmi</td>
-<td align="left"><a href="https://doi.org/10.2337/dc18-1581">Bergenstal (2018)</a></td>
+<td align="left"><a href="https://doi.org/10.2337/dc18-1581">Bergenstal
+(2018)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">GRADE (Glycemic Risk Assessment Diabetes Equation)</td>
 <td align="center">grade</td>
-<td align="left"><a href="https://doi.org/10.1111/j.1464-5491.2007.02119.x">Hill et al. (2007)</a></td>
+<td align="left"><a href="https://doi.org/10.1111/j.1464-5491.2007.02119.x">Hill et
+al. (2007)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="even">
 <td align="left">GRADEeu</td>
 <td align="center">grade_eugly</td>
-<td align="left"><a href="https://doi.org/10.1111/j.1464-5491.2007.02119.x">Hill et al. (2007)</a></td>
+<td align="left"><a href="https://doi.org/10.1111/j.1464-5491.2007.02119.x">Hill et
+al. (2007)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">GRADEhyper</td>
 <td align="center">grade_hyper</td>
-<td align="left"><a href="https://doi.org/10.1111/j.1464-5491.2007.02119.x">Hill et al. (2007)</a></td>
+<td align="left"><a href="https://doi.org/10.1111/j.1464-5491.2007.02119.x">Hill et
+al. (2007)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="even">
 <td align="left">GRADEhypo</td>
 <td align="center">grade_hypo</td>
-<td align="left"><a href="https://doi.org/10.1111/j.1464-5491.2007.02119.x">Hill et al. (2007)</a></td>
+<td align="left"><a href="https://doi.org/10.1111/j.1464-5491.2007.02119.x">Hill et
+al. (2007)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">GVP (Glucose Variability Percentage)</td>
 <td align="center">gvp</td>
-<td align="left"><a href="https://dx.doi.org/10.1089%2Fdia.2017.0187">Peyser et al. (2017)</a></td>
+<td align="left"><a href="https://dx.doi.org/10.1089%2Fdia.2017.0187">Peyser et
+al. (2017)</a></td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">HBGI (High Blood Glucose Index)</td>
 <td align="center">hbgi</td>
-<td align="left"><a href="https://doi.org/10.2337/dc06-1085">Kovatchev et al. (2006)</a></td>
+<td align="left"><a href="https://doi.org/10.2337/dc06-1085">Kovatchev
+et al. (2006)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">LBGI (Low Blood Glucose Index)</td>
 <td align="center">lbgi</td>
-<td align="left"><a href="https://doi.org/10.2337/dc06-1085">Kovatchev et al. (2006)</a></td>
+<td align="left"><a href="https://doi.org/10.2337/dc06-1085">Kovatchev
+et al. (2006)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="even">
 <td align="left">Hyperglycemia Index Parameters</td>
 <td align="center">hyper_index</td>
-<td align="left"><a href="https://doi.org/10.1089/dia.2008.0132">Rodbard (2009)</a></td>
+<td align="left"><a href="https://doi.org/10.1089/dia.2008.0132">Rodbard
+(2009)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="odd">
 <td align="left">Hypoglycemia Index Parameters</td>
 <td align="center">hypo_index</td>
-<td align="left"><a href="https://doi.org/10.1089/dia.2008.0132">Rodbard (2009)</a></td>
+<td align="left"><a href="https://doi.org/10.1089/dia.2008.0132">Rodbard
+(2009)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="even">
 <td align="left">IGC (Index of Glycemic Control)</td>
 <td align="center">igc</td>
-<td align="left"><a href="https://doi.org/10.1089/dia.2008.0132">Rodbard (2009)</a></td>
+<td align="left"><a href="https://doi.org/10.1089/dia.2008.0132">Rodbard
+(2009)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="odd">
@@ -404,7 +436,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <tr class="odd">
 <td align="left">M-value</td>
 <td align="center">m_value</td>
-<td align="left"><a href="https://doi.org/10.1111/j.0954-6820.1965.tb01810.x">Schlichtkrull et al. (1965)</a></td>
+<td align="left"><a href="https://doi.org/10.1111/j.0954-6820.1965.tb01810.x">Schlichtkrull
+et al. (1965)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="even">
@@ -416,13 +449,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <tr class="odd">
 <td align="left">MAG (Mean Absolute Glucose)</td>
 <td align="center">mag</td>
-<td align="left"><a href="https://doi.org/10.1097/ccm.0b013e3181cc4be9">Hermanides et al. (2010)</a></td>
+<td align="left"><a href="https://doi.org/10.1097/ccm.0b013e3181cc4be9">Hermanides et
+al. (2010)</a></td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
 <td align="left">MAGE (Mean Amplitude of Glycemic Excursions)</td>
 <td align="center">mage</td>
-<td align="left"><a href="https://doi.org/10.2337/diacare.3.1.58">Service &amp; Nelson (1980)</a></td>
+<td align="left"><a href="https://doi.org/10.2337/diacare.3.1.58">Service &amp; Nelson
+(1980)</a></td>
 <td align="left">No</td>
 </tr>
 <tr class="odd">
@@ -440,7 +475,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <tr class="odd">
 <td align="left">MODD (Mean Of Daily Differences)</td>
 <td align="center">modd</td>
-<td align="left"><a href="https://doi.org/10.2337/diacare.3.1.58">Service &amp; Nelson (1980)</a></td>
+<td align="left"><a href="https://doi.org/10.2337/diacare.3.1.58">Service &amp; Nelson
+(1980)</a></td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
@@ -462,69 +498,85 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <td align="left">No</td>
 </tr>
 <tr class="odd">
+<td align="left">% Baseline Recovery (meal metric)</td>
+<td align="center">meal_metrics</td>
+<td align="left"><a href="https://doi.org/10.2337/db12-1396">Service
+(2013)</a></td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
 <td align="left">Quantiles</td>
 <td align="center">quantile_glu</td>
 <td align="left"></td>
 <td align="left">No</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">Range</td>
 <td align="center">range_glu</td>
 <td align="left"></td>
 <td align="left">No</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">Rate of change (ROC)</td>
 <td align="center">roc</td>
-<td align="left"><a href="https://doi.org/10.1089/dia.2008.0138">Clarke et al. (2009)</a></td>
+<td align="left"><a href="https://doi.org/10.1089/dia.2008.0138">Clarke
+et al. (2009)</a></td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">Standard Deviation of ROC</td>
+<td align="center">sd_roc</td>
+<td align="left"><a href="https://doi.org/10.1089/dia.2008.0138">Clarke
+et al. (2009)</a></td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
-<td align="left">Standard Deviation of ROC</td>
-<td align="center">sd_roc</td>
-<td align="left"><a href="https://doi.org/10.1089/dia.2008.0138">Clarke et al. (2009)</a></td>
-<td align="left">Yes</td>
-</tr>
-<tr class="odd">
 <td align="left">Standard Deviation</td>
 <td align="center">sd_glu</td>
 <td align="left"></td>
 <td align="left">No</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">SdB (between days, within timepoints)</td>
 <td align="center">sd_measures (SdB)</td>
-<td align="left"><a href="https://doi.org/10.1089/dia.2009.0015">Rodbard (2009)</a></td>
-<td align="left">Yes</td>
-</tr>
-<tr class="odd">
-<td align="left">SdBDM (between days, within timepoints, corrected for changes in daily means)</td>
-<td align="center">sd_measures (SdBDM)</td>
-<td align="left"><a href="https://doi.org/10.1089/dia.2009.0015">Rodbard (2009)</a></td>
+<td align="left"><a href="https://doi.org/10.1089/dia.2009.0015">Rodbard
+(2009)</a></td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
+<td align="left">SdBDM (between days, within timepoints, corrected for
+changes in daily means)</td>
+<td align="center">sd_measures (SdBDM)</td>
+<td align="left"><a href="https://doi.org/10.1089/dia.2009.0015">Rodbard
+(2009)</a></td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
 <td align="left">SdDM (horizontal sd)</td>
 <td align="center">sd_measures (SdDM)</td>
-<td align="left"><a href="https://doi.org/10.1089/dia.2009.0015">Rodbard (2009)</a></td>
-<td align="left">Yes</td>
-</tr>
-<tr class="odd">
-<td align="left">SdHHMM (between time points)</td>
-<td align="center">sd_measures (SdHHMM)</td>
-<td align="left"><a href="https://doi.org/10.1089/dia.2009.0015">Rodbard (2009)</a></td>
+<td align="left"><a href="https://doi.org/10.1089/dia.2009.0015">Rodbard
+(2009)</a></td>
 <td align="left">Yes</td>
 </tr>
 <tr class="even">
-<td align="left">SdW (vertical within days)</td>
-<td align="center">sd_measures (Sd)</td>
-<td align="left"><a href="https://doi.org/10.1089/dia.2009.0015">Rodbard (2009)</a></td>
+<td align="left">SdHHMM (between time points)</td>
+<td align="center">sd_measures (SdHHMM)</td>
+<td align="left"><a href="https://doi.org/10.1089/dia.2009.0015">Rodbard
+(2009)</a></td>
 <td align="left">Yes</td>
 </tr>
 <tr class="odd">
+<td align="left">SdW (vertical within days)</td>
+<td align="center">sd_measures (Sd)</td>
+<td align="left"><a href="https://doi.org/10.1089/dia.2009.0015">Rodbard
+(2009)</a></td>
+<td align="left">Yes</td>
+</tr>
+<tr class="even">
 <td align="left">SdWSH (within time series)</td>
 <td align="center">sd_measures (SdWSH)</td>
-<td align="left"><a href="https://doi.org/10.1089/dia.2009.0015">Rodbard (2009)</a></td>
+<td align="left"><a href="https://doi.org/10.1089/dia.2009.0015">Rodbard
+(2009)</a></td>
 <td align="left">Yes</td>
 </tr>
 </tbody>
