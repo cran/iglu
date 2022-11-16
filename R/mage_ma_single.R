@@ -124,6 +124,7 @@ mage_ma_single <- function(data, short_ma = 5, long_ma = 32, type = c('auto', 'p
                   DIFF = MA_Short - MA_Long)
 
   # 2b. Create a preallocated list of crossing point ids & type
+  # Why is this a thousand? This is not great.
   list_cross <- list("id" = rep.int(NA, 1000), "type" = rep.int(NA, 1000))
   list_cross$id[1] <- 1
   list_cross$type[1] <- ifelse(.data$DIFF[1] > 0, 1, 0)
@@ -195,13 +196,19 @@ mage_ma_single <- function(data, short_ma = 5, long_ma = 32, type = c('auto', 'p
 
   while(n < length(minmax)) {
     height1 <- minmax[n+1] - minmax[n]
+    # Redefined variable type, not great
     type <- crosses[n+1, "type"]  ## crosses has 1 more element so add 1
 
+    # Check if excursion is above SD. If smaller - go to next excursion.
     if(abs(height1) > standardD) {
+      # Check if it was specified whether MAGE+ or MAGE- should be computed.
+      # If not specified (-1), determine based on value of height1
+      # height1 > 0 means it's nadir to peak
       if(nadir2peak == -1) { # Assigns nadir2peak
         nadir2peak <- ifelse(height1 > 0, 1, 0)
       }
 
+      # Once plus or minus is specified, only look at those excursions that match the type
       if(nadir2peak == type) {
         if(n+1 == length(minmax)) { # covers case where one before last
           height2 <- minmax[n+1]-minmax[n]
@@ -217,14 +224,14 @@ mage_ma_single <- function(data, short_ma = 5, long_ma = 32, type = c('auto', 'p
             }
           }
         }
-
         else {
           x <- 1
           height2 <- 0
           while(!(abs(height2) >= standardD) && n+x+1 <= length(minmax)) {  # checks bounds
             height2 <- minmax[n+x+1]-minmax[n+x]
 
-            if(abs(height2) >= standardD || n+x+1 == length(minmax)-1 || n+x+1 == length(minmax)) { # appends height2 to height
+            if(abs(height2) >= standardD || n+x+1 == length(minmax)-1 || n+x+1 == length(minmax)) {
+              # appends height2 to height
               tp_indexes <- append(tp_indexes, indexes[n])
               if(nadir2peak == 1) {
                 heights <- append(heights, abs(minmax[n]- max(minmax[n:(n+x+1)])))
