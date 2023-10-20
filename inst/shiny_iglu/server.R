@@ -1,5 +1,5 @@
-#library(shiny)
-#library(DT)
+# library(shiny)
+# library(DT)
 
 shinyServer(function(input, output) {
 
@@ -62,7 +62,10 @@ shinyServer(function(input, output) {
       data = iglu::example_data_5_subject
     }
 
-    iglu:::read_df_or_vec(data, id = input$id, time = input$time, gl = input$gl)
+    # what does this line do?
+    # iglu:::read_df_or_vec(data, id = input$id, time = input$time, gl = input$gl)
+
+    return(data)
   })
 
 
@@ -72,7 +75,7 @@ shinyServer(function(input, output) {
   #add metric based on the parameter it takes in
   parameter_type <- reactive({
     #metric is considered as parameter type "none" if it only requires data as a parameter
-    if(input$metric %in% c("adrr", "cv_glu", "ea1c", "gmi", "cv_measures", "episode_calculation", "grade", "gvp", "hbgi", "iqr_glu", "j_index", "lbgi",
+    if(input$metric %in% c("adrr", "cv_glu", "ea1c", "gmi", "cv_measures", "episode_calculation", "grade", "gri", "gvp", "hbgi", "iqr_glu", "j_index", "lbgi",
                            "mean_glu", "median_glu", "range_glu", "sd_glu", "sd_measures", "summary_glu", "all_metrics")){
       return("none")
     }
@@ -197,7 +200,7 @@ shinyServer(function(input, output) {
         textInput("parameter", "Specify Lower and Upper Limits", value = "70, 180")
       }
       else if(input$metric == "episode_calculation"){
-        textInput("parameter", "Specify Parameter", value = "100.0, 70")
+        textInput("parameter", "Specify Parameter", value = "70, 54")
       }
     }
     else if(parameter_type == "nested"){
@@ -849,6 +852,11 @@ shinyServer(function(input, output) {
     helpText("Enter the ID of a subject to display their AGP Report")
   })
 
+  output$agp_span <- renderUI({
+    sliderInput("agp_span", "Enter amount of smoothing for AGP plot",
+                min = 0.1, max = 0.7, value = 0.3, step = 0.1)
+  })
+
   agp_data <- reactive({ # define reactive function to subset data for plotting each time user changes subjects list
 
     validate (
@@ -896,7 +904,8 @@ shinyServer(function(input, output) {
 
     library(iglu)
     data = agp_data()
-    string = paste('iglu::plot_agp(data = data)')
+    string = paste0('iglu::plot_agp(data = data, smooth = TRUE, ', 'span = ',
+                    input$agp_span, ')')
     eval(parse(text = string))
   })
 
@@ -992,9 +1001,8 @@ shinyServer(function(input, output) {
     lv1_hyper = input$lv1hyperThreshold
     lv2_hyper = input$lv2hyperThreshold
     dur_length = input$DurationLength
-    color_scheme = input$colorScheme
     string = paste('iglu::epicalc_profile(data = data, lv1_hypo= lv1_hypo, lv2_hypo = lv2_hypo,
-                   lv1_hyper=lv1_hyper,lv2_hyper=lv2_hyper,color_scheme= color_scheme, dur_length=dur_length)')
+                   lv1_hyper=lv1_hyper,lv2_hyper=lv2_hyper, dur_length=dur_length)')
     eval(parse(text = string))
   })
 

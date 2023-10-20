@@ -25,9 +25,9 @@ fig2data <- example_data_1_subject[200:400, ]
 # plot using mage function with plot = TRUE
 mage(fig2data, plot = TRUE, title = "Glucose Trace with Gaps - Subject 1")
 
-## ---- echo=FALSE, fig.width=10, fig.height=7, out.width="700px", out.height ="400px"----
+## ----echo=FALSE, fig.width=10, fig.height=7, out.width="700px", out.height ="400px"----
 knitr::include_graphics("mage_figures/Figure3_heatmap_percent_error.png")
 
-## ---- echo=FALSE, fig.width=10, fig.height=7, out.width="700px", out.height ="400px"----
+## ----echo=FALSE, fig.width=10, fig.height=7, out.width="700px", out.height ="400px"----
 knitr::include_graphics("mage_figures/Figure4_boxplots.png")
 
