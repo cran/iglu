@@ -76,6 +76,7 @@ shinyUI(fluidPage(
                                                                                `Mean` = 'mean_glu',
                                                                                `Median` = 'median_glu',
                                                                                `MODD` = 'modd',
+                                                                               `PGS` = 'pgs',
                                                                                `Quantiles` = 'quantile_glu',
                                                                                `Range` = 'range_glu',
                                                                                `Rate of Change (ROC)` = 'roc',
@@ -91,6 +92,10 @@ shinyUI(fluidPage(
                uiOutput("second_parameter_helptext"),
                uiOutput("select_third_parameter"),
                uiOutput("third_parameter_helptext"),
+               uiOutput("select_fourth_parameter"),
+               uiOutput("fourth_parameter_helptext"),
+               uiOutput("select_fifth_parameter"),
+               uiOutput("fifth_parameter_helptext"),
                checkboxInput("filter_sleep_wake", "Calculate metric for sleeping/waking hours?", value = FALSE, width = NULL),
                conditionalPanel(
                  condition = "input.filter_sleep_wake",

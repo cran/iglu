@@ -5,11 +5,11 @@
 \title{Calculate Meal Metrics}
 \usage{
 meal_metrics(data, mealtimes, before_win = 1, after_win = 3,
-recovery_win = 1, interpolate = FALSE, adjust_mealtimes = FALSE, dt0 = NULL,
+recovery_win = 1, interpolate = TRUE, adjust_mealtimes = TRUE, dt0 = NULL,
 inter_gap = 45, tz = "")
 }
 \arguments{
-\item{data}{DataFrame object with column names "id", "time", and "gl". Should only be data for 1 subject. In case multiple subject ids are detected, the warning is produced and only 1st subject is used.}
+\item{data}{DataFrame object with column names "id", "time", and "gl". Should only be data for 1 subject. In case multiple subject ids are detected, a warning is produced and only 1st subject is used.}
 
 \item{mealtimes}{Either a vector of mealtimes, corresponding
 to data being from a single subject, OR a dataframe with at least 2 columns labeled
@@ -52,10 +52,10 @@ If no meal column is given in the original data, one will be automatically gener
 with a unique number for each meal.
 }
 \examples{
-data(example_data_1_subject)
-data(example_meal)
-meal_metrics(example_data_1_subject, example_meal, interpolate = TRUE)
-meal_metrics(example_data_1_subject, example_meal, adjust_mealtimes = TRUE)
+data(example_data_hall)
+data(example_meals_hall)
+meal_metrics(example_data_hall, example_meals_hall)
+meal_metrics(example_data_hall, example_meals_hall)
 
 }
 \references{

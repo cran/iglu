@@ -1,8 +1,4 @@
-# library(shiny)
-# library(DT)
-
 shinyServer(function(input, output) {
-
   ############################## DATA SECTION ############################
 
   data <- reactive({
@@ -39,13 +35,12 @@ shinyServer(function(input, output) {
                      buttons = c("copy", "csv", "excel", "pdf", "print"),
                      paging = FALSE)
     )
-
   })
 
   output$downloaddata <- downloadHandler(
     filename = function() {
       filename <- paste0(gsub("\\.csv", "",basename(input$datafile$name)), "_processed")
-      paste(filename, ".csv", sep = "")
+      paste0(filename, ".csv")
     },
     content = function(file) {
       write.csv(data(), file, row.names = FALSE)
@@ -68,16 +63,16 @@ shinyServer(function(input, output) {
     return(data)
   })
 
-
   ############################# METRIC SECTION ######################################################
-
-
   #add metric based on the parameter it takes in
   parameter_type <- reactive({
     #metric is considered as parameter type "none" if it only requires data as a parameter
     if(input$metric %in% c("adrr", "cv_glu", "ea1c", "gmi", "cv_measures", "episode_calculation", "grade", "gri", "gvp", "hbgi", "iqr_glu", "j_index", "lbgi",
-                           "mean_glu", "median_glu", "range_glu", "sd_glu", "sd_measures", "summary_glu", "all_metrics")){
+                           "mean_glu", "median_glu", "range_glu", "sd_glu", "sd_measures", "summary_glu")){
       return("none")
+    }
+    else if(input$metric == "all_metrics") {
+      return("all_metrics")
     }
     #metric is considered as parameter type "time" if it takes in data and time zone as parameters
     else if(input$metric %in% c("auc","cv_measures", "sd_measures")){
@@ -93,6 +88,9 @@ shinyServer(function(input, output) {
     }
     else if(input$metric == 'mage') {
       return("mage")
+    }
+    else if(input$metric == 'pgs'){
+      return('pgs')
     }
     else if(input$metric %in% c("hyper_index", "hypo_index")){
       return("value1")
@@ -113,6 +111,7 @@ shinyServer(function(input, output) {
       return("nested")
     }
   })
+
   #specify first parameter and the default values
   output$select_parameter <- renderUI({
     parameter_type = parameter_type()
@@ -134,10 +133,18 @@ shinyServer(function(input, output) {
         textInput("parameter", "Specify Parameter", value = "0, 25, 50, 75, 100")
       }
     }
+    else if(parameter_type == "all_metrics") {
+      if(input$metric == "all_metrics") {
+        radioButtons("parameter", "Metrics to Include", choiceNames=c('All', 'Consensus Only'), choiceValues=c('all', 'consensus_only'))
+      }
+    }
     else if(parameter_type == "mage") {
       if(input$metric == "mage") {
         radioButtons("parameter", "Mage Version", choiceNames=c('Version 2: ma (recommended)', 'Version 1: naive (superseded)'),choiceValues=c("ma","naive"))
       }
+    }
+    else if(parameter_type == 'pgs') {
+      textInput('parameter', 'Episode Duration', value = 20)
     }
     else if(parameter_type == "value"){
 
@@ -213,7 +220,6 @@ shinyServer(function(input, output) {
   })
 
   #add description of first parameter
-
   output$help_text <- renderUI({
     parameter_type = parameter_type()
 
@@ -274,6 +280,9 @@ shinyServer(function(input, output) {
         helpText("Enter algorithm version in single quotes: 'ma' (default) or 'naive'")
       }
 
+    }
+    else if(parameter_type == 'pgs'){
+      helpText('Enter minimum duration in minutes for an episode')
     }
     else if(parameter_type == "value1"){
       if(input$metric == "hyper_index"){
@@ -343,6 +352,9 @@ shinyServer(function(input, output) {
         textInput("parameter2", "Short MA length", value="5")
       }
     }
+    else if(parameter_type == 'pgs') {
+      textInput('parameter2', 'Episode Ending Duration', value = '30')
+    }
   })
 
   #add description of second parameter
@@ -366,6 +378,9 @@ shinyServer(function(input, output) {
       if(input$parameter == "ma") {
         helpText("Allowable values between 5 and 15. (5 recommended)")
       }
+    }
+    else if(parameter_type == 'pgs'){
+      helpText("Enter minimum duration in minutes of improved glycemia for episodes to end")
     }
 
   })
@@ -420,6 +435,50 @@ shinyServer(function(input, output) {
     }
   })
 
+  #specify fourth parameter and its default value
+  output$select_fourth_parameter <- renderUI({
+    parameter_type = parameter_type()
+
+    if(parameter_type == "mage") {
+      if(input$parameter == "ma") {
+        radioButtons("parameter4", "Direction", choiceNames=c('Average', 'Service', 'Max', 'Plus', 'Minus'),choiceValues=c('avg', 'service', 'max', 'plus', 'minus'))
+      }
+    }
+  })
+
+  #add description on fourth parameter
+  output$fourth_parameter_helptext <- renderUI({
+    parameter_type = parameter_type()
+
+    if(parameter_type == "mage"){
+      if(input$parameter == "ma") {
+        helpText("Whether you calculate MAGE+, MAGE-, MAGEservice, MAGEavg, or MAGEmax")
+      }
+    }
+  })
+
+  #specify third parameter and its default value
+  output$select_fifth_parameter <- renderUI({
+    parameter_type = parameter_type()
+
+    if(parameter_type == "mage") {
+      if(input$parameter == "ma") {
+        textInput("parameter5", "Max Gap", value="180")
+      }
+    }
+  })
+
+  #add description on third parameter
+  output$fifth_parameter_helptext <- renderUI({
+    parameter_type = parameter_type()
+
+    if(parameter_type == "mage"){
+      if(input$parameter == "ma") {
+        helpText("Maximum gap (minutes) in the glucose trace before MAGE is calculated on each segment independently. Recommended: >=120 min")
+      }
+    }
+  })
+
   output$sleep_wake_help <- renderUI({
     helpText("Enter a real number 0-24.")
   })
@@ -429,7 +488,6 @@ shinyServer(function(input, output) {
     string = ""
     parameter_type = parameter_type()
     data = transform_data()
-
 
     #### Validate catches for parameter 1 #####
     if (is.null(input$parameter)) {
@@ -441,7 +499,13 @@ shinyServer(function(input, output) {
         need (input$metric == "mage" | parameter_type == "none",
               "Please wait - Rendering")
       )
-    } else if (grepl(',', input$parameter) & !grepl("\\(", input$parameter)) {
+    }
+    else if (parameter_type == "all_metrics") {
+      validate (
+        need(input$parameter %in% c("all", "consensus_only"), "Please wait - Rendering")
+      )
+    }
+    else if (grepl(',', input$parameter) & !grepl("\\(", input$parameter)) {
       if (length(strsplit(input$parameter, split = ",")[[1]]) != 2) {
         validate (
           need(parameter_type %in% c("list", "none","time"), "Please wait - Rendering")
@@ -456,12 +520,12 @@ shinyServer(function(input, output) {
         need(parameter_type %in% c("nested", "none","time"), "Please wait - Rendering")
       )
     } else if (!grepl(',', input$parameter)) {
-      # print(input$parameter) # un-comment for bug-fixing
       validate(
-        need(parameter_type %in% c("value", "value1", "value_time", "none","time"),
+        need(parameter_type %in% c("value", "value1", "value_time", "none","time", "pgs"),
              "Please wait - Rendering")
       )
     }
+
     # because MAGE input is unique (character)
     if (input$metric == "mage") {
       validate(
@@ -481,48 +545,53 @@ shinyServer(function(input, output) {
       )
     }
 
-
     #loading iglu library and using metric function
     library(iglu)
     if(is.null(input$parameter) | parameter_type == "none"){
-      string = paste("iglu::", input$metric, "(data)", sep = "")
+      string = paste0("iglu::", input$metric, "(data)")
     }
     else if(is.null(input$parameter) | parameter_type == "time"){
-      string = paste("iglu::", input$metric, "(data,", "tz=","'",input$tz,"')",sep = "")
+      string = paste0("iglu::", input$metric, "(data,", "tz=","'",input$tz,"')")
     }
 
     else if(parameter_type == "list"){
-      string = paste("iglu::", input$metric, "(data, c(", input$parameter, "))", sep = "")
+      string = paste0("iglu::", input$metric, "(data, c(", input$parameter, "))")
     }
 
     else if(parameter_type == "value"){
-      string = paste("iglu::", input$metric, "(data, ", input$parameter, ")", sep = "")
+      string = paste0("iglu::", input$metric, "(data, ", input$parameter, ")")
     }
     else if(parameter_type == "value1"){
-      string = paste("iglu::", input$metric, "(data, ", input$parameter, ",",input$parameter2,",",input$parameter3, ")", sep = "")
+      string = paste0("iglu::", input$metric, "(data, ", input$parameter, ",",input$parameter2,",",input$parameter3, ")")
     }
     else if(parameter_type == "value_time"){
-      string = paste("iglu::", input$metric, "(data, ", input$parameter, ",","tz=" ,"'", input$tz,"'" ,")", sep = "")
+      string = paste0("iglu::", input$metric, "(data, ", input$parameter, ",","tz=" ,"'", input$tz,"'" ,")")
     }
     else if(parameter_type == "lwrupr"){
-      string = paste("iglu::", input$metric, "(data, " , input$parameter, ")", sep = "")
+      string = paste0("iglu::", input$metric, "(data, " , input$parameter, ")")
     }
     else if(parameter_type == "lwrupr1"){
-      string = paste("iglu::", input$metric, "(data, " , input$parameter,",",input$parameter2,",",input$parameter3, ")", sep = "")
+      string = paste0("iglu::", input$metric, "(data, " , input$parameter,",",input$parameter2,",",input$parameter3, ")")
     }
     else if(parameter_type == "mage"){
       if(input$parameter == "ma") {
-        string = paste("iglu::", input$metric, "(data, version='",input$parameter, "', short_ma=", input$parameter2,", long_ma=",input$parameter3,")", sep="")
+        string = paste0("iglu::", input$metric, "(data, version='",input$parameter, "', short_ma=", input$parameter2,", long_ma=",input$parameter3,", direction='", input$parameter4,"', max_gap=", input$parameter5 ,")")
       }
       else if(input$parameter == "naive") {
-        string = paste("iglu::", input$metric, "(data, version='",input$parameter,"')", sep="")
+        string = paste0("iglu::", input$metric, "(data, version='",input$parameter,"')")
       }
+    }
+    else if(parameter_type == "all_metrics") {
+      string = paste0("iglu::", input$metric, "(data, metrics_to_include='", input$parameter , "')")
+    }
+    else if(parameter_type == 'pgs'){
+      string = paste0('iglu::', input$metric, '(data, dur_length=', input$parameter, ', end_length=', input$parameter2, ')')
     }
     else if(parameter_type == "nested"){
       strlist = strsplit(input$parameter, ")")[[1]]
       paramstr = rep.int(0, length(strlist))
       if(length(strlist) == 1){
-        paramstr = paste("c", strlist[1], ")", sep = "")
+        paramstr = paste0("c", strlist[1], ")")
       }
 
       else {
@@ -530,11 +599,11 @@ shinyServer(function(input, output) {
           strlist[i] = substring(strlist[i], 3)
         }
         for(s in 1:length(strlist)){
-          paramstr[s] = paste("c", strlist[s], ")", sep = "")
+          paramstr[s] = paste0("c", strlist[s], ")")
         }
         paramstr = paste(paramstr, collapse = ", ")
       }
-      string = paste("iglu::", input$metric, "(data, list(", paramstr, "))", sep= "")
+      string = paste0("iglu::", input$metric, "(data, list(", paramstr, "))")
     }
 
     if (input$filter_sleep_wake) {
@@ -629,22 +698,40 @@ shinyServer(function(input, output) {
     subject = unique(data$id)[1]
 
     tags$div(
-      textInput("plot_subjects", "Enter Subject ID", value = subject),
+      textInput("plot_subjects", "Enter Subject ID", value = subject), # TODO: change this to select/dropdown
       helpText("Enter the ID of a subject to display their MAGE plot"),
       textInput("mage_short_ma", "Short MA length", value="5"),
       textInput("mage_long_ma", "Long MA length", value="32"),
+      selectInput("direction", "Direction", c(
+        'Average' = 'avg',
+        'Service' = 'service',
+        'Max' = 'max',
+        'Plus' = 'plus',
+        'Minus' = 'minus'
+      )),
+      helpText("Whether you calculate MAGE+, MAGE-, MAGEservice, MAGEavg, or MAGEmax"),
+      textInput("max_gap", "Max Gap", value="180"),
+      helpText("Maximum gap (minutes) in the glucose trace before MAGE is calculated on each segment independently. Recommended: >=120 min"),
       radioButtons("mage_show_ma", "Show Moving Averages on Plot", c(
         "No" = FALSE,
         "Yes" = TRUE
       ), inline=TRUE),
+      radioButtons("show_excursions", "Show Excursions on Plot", c(
+        "No" = FALSE,
+        "Yes" = TRUE
+      ), selected=TRUE, inline=TRUE),
       textInput("mage_title", "Title", value = "default"),
       textInput("mage_xlab", "X Label", value = "default"),
-      textInput("mage_ylab", "Y Label", value = "default")
+      textInput("mage_ylab", "Y Label", value = "default"),
+      # TODO: eventually incorporate Plotly
+      # radioButtons("plot_type", "Select Plot Type", c(
+      #   "Plotly (interactive)" = 'plotly',
+      #   "GGPlot (static)" = 'ggplot'
+      # ), inline=TRUE),
     )
   })
 
   output$lasagna_sidebar <- renderUI({
-
     data = transform_data()
     plottype = plottype()
 
@@ -703,7 +790,6 @@ shinyServer(function(input, output) {
   })
 
   output$rocplots_sidebar <- renderUI({
-
     data = transform_data()
     plottype = plottype()
 
@@ -721,7 +807,6 @@ shinyServer(function(input, output) {
   ### Render Plot
 
   plotFunc <- reactive({
-
     library(iglu)
 
     plottype = plottype() # bring reactive input variable into this renderPlot call
@@ -735,8 +820,8 @@ shinyServer(function(input, output) {
       )
 
       data = transform_data()
-      string = paste('iglu::plot_glu(data = data, plottype = "tsplot", datatype = "all", lasagnatype = NULL, ',
-                     input$plot_TR, ', subjects = NULL, inter_gap = 45, tz = "", "blue-orange", log = ', input$plot_log, ')' ,sep = "")
+      string = paste0('iglu::plot_glu(data = data, plottype = "tsplot", datatype = "all", lasagnatype = NULL, ',
+                     input$plot_TR, ', subjects = NULL, inter_gap = 45, tz = "", "blue-orange", log = ', input$plot_log, ')')
       eval(parse(text = string))
     }
     else if(plottype == "lasagnamulti"){
@@ -747,10 +832,10 @@ shinyServer(function(input, output) {
       )
 
       data = transform_data()
-      string = paste('iglu::plot_lasagna(data = data, datatype = "', input$plot_datatype, '", lasagnatype = "',
+      string = paste0('iglu::plot_lasagna(data = data, datatype = "', input$plot_datatype, '", lasagnatype = "',
                      input$plot_lasagnatype, '", maxd = ', input$plot_maxd, ', limits = c(', input$plot_limits, ') ,',
                      input$plot_midpoint, ', ', input$plot_TR, ', dt0 = NULL, inter_gap = 60, tz ="",',
-                     input$plot_color_scheme, ', ', input$plot_log, ')', sep = "")
+                     input$plot_color_scheme, ', ', input$plot_log, ')')
       eval(parse(text = string))
     }
     else if(plottype == "lasagnasingle"){
@@ -760,22 +845,22 @@ shinyServer(function(input, output) {
       )
 
       data = subset_data() # subset data to only user-specified subject
-      string = paste('iglu::plot_lasagna_1subject(data = data, lasagnatype = "',
+      string = paste0('iglu::plot_lasagna_1subject(data = data, lasagnatype = "',
                      input$plot_lasagnatype, '", limits = c(', input$plot_limits, ') ,',
                      input$plot_midpoint, ', ', input$plot_TR, ', dt0 = NULL, inter_gap = 60, tz = "",',
-                     input$plot_color_scheme, ', ', input$plot_log, ')', sep = "")
+                     input$plot_color_scheme, ', ', input$plot_log, ')')
       eval(parse(text = string))
     }
     else if(plottype == "plot_roc"){
       data = subset_data() # subset data to only user-specified subject
-      string = paste('iglu::plot_roc(data = data',
-                     ', timelag = ', input$plot_timelag, ', tz = "")', sep = "")
+      string = paste0('iglu::plot_roc(data = data',
+                     ', timelag = ', input$plot_timelag, ', tz = "")')
       eval(parse(text = string))
     }
     else if(plottype == "hist_roc"){
       data = subset_data() # subset data to only user-specified subject
-      string = paste('iglu::hist_roc(data = data',
-                     ', timelag = ', input$plot_timelag, ', tz = "")', sep = "")
+      string = paste0('iglu::hist_roc(data = data',
+                     ', timelag = ', input$plot_timelag, ', tz = "")')
       eval(parse(text = string))
     }
     else if(plottype == "mage"){
@@ -790,23 +875,24 @@ shinyServer(function(input, output) {
       mage_ylab = ifelse(tolower(input$mage_ylab) == "default", NA, paste0("'",input$mage_ylab,"'"))
 
       string = paste0("iglu::mage_ma_single(data=data,plot=TRUE,short_ma=",input$mage_short_ma,",long_ma=",
-                      input$mage_long_ma,",show_ma=", input$mage_show_ma,",
-                      ,title=",mage_title,",xlab=", mage_xlab,",ylab=",mage_ylab,")")
+                      input$mage_long_ma,", direction='", input$direction, "', max_gap='", input$max_gap,
+                      "', show_ma=", input$mage_show_ma,", show_excursions=", input$show_excursions, ",title=",mage_title,",xlab=", mage_xlab,",ylab=",mage_ylab,")")
+
       eval(parse(text=string))
     }
-
   })
 
+  # TODO: Eventually incorporate Shiny for MAGE, using: https://stackoverflow.com/questions/48017341/how-to-correctly-output-plotly-plots-in-shiny
   output$plot <- renderPlot({
-    plotFunc()
-  })
+        plotFunc()
+      })
 
   options(shiny.usecairo = T)
 
   output$pdfButton <- downloadHandler(
     filename = function() {
       plottype = plottype()
-      paste(plottype, '.pdf', sep = '')
+      paste0(plottype, '.pdf')
     },
     content = function(file) {
       cairo_pdf(filename = file, width = 20, height = 18, bg = "transparent")
@@ -818,7 +904,7 @@ shinyServer(function(input, output) {
   output$pngButton <- downloadHandler(
     filename = function() {
       plottype = plottype()
-      paste(plottype, '.png', sep = '')
+      paste0(plottype, '.png')
     },
     content = function(file) {
       png(file)
@@ -830,7 +916,7 @@ shinyServer(function(input, output) {
   output$epsButton <- downloadHandler(
     filename = function() {
       plottype = plottype()
-      paste(plottype, '.eps', sep = '')
+      paste0(plottype, '.eps')
     },
     content = function(file) {
       postscript(file)
@@ -883,7 +969,6 @@ shinyServer(function(input, output) {
   })
 
   output$agp_metrics <- DT::renderDataTable({
-
     DT::datatable(agpMetrics(), options = list(dom = 't'), rownames = FALSE, colnames = "")
   })
 
@@ -910,12 +995,10 @@ shinyServer(function(input, output) {
   })
 
   output$plot_agp <- renderPlot({
-
     plotAGP()
   })
 
   plotDaily <- reactive({
-
     library(iglu)
     data = agp_data()
     string = paste('iglu::plot_daily(data = data)')
@@ -923,7 +1006,6 @@ shinyServer(function(input, output) {
   })
 
   output$plot_daily <- renderPlot({
-
     plotDaily()
   })
 
@@ -931,7 +1013,7 @@ shinyServer(function(input, output) {
 
   output$pdfAGP<- downloadHandler(
     filename = function() {
-      paste("AGP", '.pdf', sep = '')
+      paste0("AGP", '.pdf')
     },
     content = function(file) {
       cairo_pdf(filename = file, width = 20, height = 18, bg = "transparent")
@@ -943,9 +1025,8 @@ shinyServer(function(input, output) {
   )
 
   output$pngAGP <- downloadHandler(
-
     filename = function() {
-      paste("AGP", '.png', sep = '')
+      paste0("AGP", '.png')
     },
     content = function(file) {
       png(file)
@@ -958,7 +1039,7 @@ shinyServer(function(input, output) {
 
   output$epsAGP <- downloadHandler(
     filename = function() {
-      paste("AGP", '.eps', sep = '')
+      paste0("AGP", '.eps')
     },
     content = function(file) {
       postscript(file)
@@ -969,7 +1050,6 @@ shinyServer(function(input, output) {
     }
   )
 
-
   ########## Episode calculation section#########
   ### Get desired subject
   output$episode_subject <- renderUI({
@@ -979,7 +1059,6 @@ shinyServer(function(input, output) {
   })
 
   episode_data <- reactive({ # define reactive function to subset data for plotting each time user changes subjects list
-
     validate (
       if (is.null(input$episode_subject)) {
         need(!is.null(input$episode_subject), "Please wait - Rendering")
@@ -1012,7 +1091,7 @@ shinyServer(function(input, output) {
 
   output$pdfEpisode<- downloadHandler(
     filename = function() {
-      paste("Episode", '.pdf', sep = '')
+      paste0("Episode", '.pdf')
     },
     content = function(file) {
       cairo_pdf(filename = file, width = 20, height = 18, bg = "transparent")
@@ -1023,9 +1102,8 @@ shinyServer(function(input, output) {
   )
 
   output$pngEpisode <- downloadHandler(
-
     filename = function() {
-      paste("Episode", '.png', sep = '')
+      paste0("Episode", '.png')
     },
     content = function(file) {
       png(file)
@@ -1037,7 +1115,7 @@ shinyServer(function(input, output) {
 
   output$epsEpisode <- downloadHandler(
     filename = function() {
-      paste("Episode", '.eps', sep = '')
+      paste0("Episode", '.eps')
     },
     content = function(file) {
       postscript(file)
@@ -1046,5 +1124,4 @@ shinyServer(function(input, output) {
       dev.off()
     }
   )
-
 })

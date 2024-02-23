@@ -11,6 +11,7 @@ episode_calculation(
   lv1_hyper = 180,
   lv2_hyper = 250,
   dur_length = 15,
+  end_length = 15,
   return_data = FALSE,
   dt0 = NULL,
   inter_gap = 45,
@@ -18,7 +19,7 @@ episode_calculation(
 )
 }
 \arguments{
-\item{data}{DataFrame object with column names "id", "time", and "gl". Should only be data for 1 subject. In case multiple subject ids are detected, the warning is produced and only 1st subject is used.}
+\item{data}{DataFrame object with column names "id", "time", and "gl". Should only be data for 1 subject. In case multiple subject ids are detected, a warning is produced and only 1st subject is used.}
 
 \item{lv1_hypo}{Numeric value specifying a hypoglycemia threshold for level 1}
 
@@ -30,7 +31,11 @@ episode_calculation(
 
 \item{dur_length}{Numeric value specifying the minimum duration in minutes to be
 considered an episode. Note dur_length should be a multiple of the data recording
-interval otherwise the function will round up to the nearest multiple.}
+interval otherwise the function will round up to the nearest multiple. Default
+is 15 minutes to match consensus.}
+
+\item{end_length}{Numeric value specifying the minimum duration in minutes of
+improved glycemia for an episode to end. Default is equal to dur_length to match consensus.}
 
 \item{return_data}{Boolean indicating whether to also return data with episode labels.
 Defaults to FALSE which means only episode summary statistics will be returned}
@@ -45,19 +50,21 @@ Defaults to FALSE which means only episode summary statistics will be returned}
 If return_data is FALSE, a single dataframe with columns:
 \item{id}{Subject id}
 \item{type}{Type of episode - either hypoglycemia or hyperglycemia}
-\item{level}{Level of episode - one of lv1, lv2, or extended}
+\item{level}{Level of episode - one of lv1, lv2, extended, lv1_excl}
 \item{avg_ep_per_day}{Average number of episodes per day calculated as
 (total # episodes)/(recording time in days (24hrs))}
 \item{avg_ep_duration}{Average duration of episodes in minutes}
 \item{avg_ep_gl}{Average glucose in the episode in mg/dL}
+\item{total_episodes}{Total number of episodes in the subject's glucose trace}
 
 If return_data is TRUE, returns a list where the first entry is the episode summary dataframe
-(see above) and the second entry is the input data with episode labels added.
+(see above) and the second entry is the input data with episode labels added. Note
+the data returned here has been interpolated using the CGMS2DayByDay() function.
 Mostly for use with epicalc_profile function. Format of the second list entry is:
 \item{id}{Subject id}
 \item{time}{Interpolated timestamps}
 \item{gl}{glucose in mg/dL}
-\item{**episode_label**}{One column per episode label - i.e. lv1_hypo, lv2_hypo, lv1_hyper, lv2_hyper, ext_hypo.
+\item{[episode_label]}{One column per episode label - i.e. lv1_hypo, lv2_hypo, lv1_hyper, lv2_hyper, ext_hypo.
 0 means not this type of episode, a positive integer label is assigned to each episode.
 Note the labels are *not* unique by subject only unique by segment}
 }
@@ -68,7 +75,11 @@ and optionally returns data with episode label columns added
 \details{
 We follow the definition of episodes given in the 2023 consensus by Battelino et al.
 Note we have classified lv2 as a subset of lv1 since we find the consensus to be
-slightly ambiguous.
+slightly ambiguous. For lv1 exclusive of lv2, please see lv1_excl which summarises
+episodes that were exclusively lv1 and did not cross the lv2 threshold. Also note,
+hypo extended refers to episodes that are >120 consecutive minutes below lv1 hypo
+and ends with at least 15 minutes of normoglycemia. For more details on each category
+please see the reference below (Battelino et al 2023).
 }
 \examples{
 episode_calculation(example_data_5_subject, lv1_hypo=100, lv1_hyper= 120)
@@ -80,6 +91,9 @@ trials: an international consensus statement
 \emph{Lancet Diabetes & Endocrinology} \strong{11(1)} .42-57,
 \doi{10.1016/s2213-8587(22)00319-9}.
 }
+\seealso{
+epicalc_profile()
+}
 \author{
-Johnathan Shih, Jung Hoon Seo, Elizabeth Chun
+Elizabeth Chun, Jung Hoon Seo, Johnathan Shih
 }
