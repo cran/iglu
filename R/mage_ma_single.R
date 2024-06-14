@@ -1,25 +1,26 @@
 #' Calculates Mean Amplitude of Glycemic Excursions (see "mage")
 #'
-#' @description This function is an internal function used by "mage". The function will calculate the Mean Amplitude of Glycemic Excursions (MAGE) on \strong{all} the values of the inputted data set. To calculate separate MAGE values for a group of subjects, use the "mage" function.
+#' @description This function is an internal function used `mage`. The function will calculate the Mean Amplitude of Glycemic Excursions (MAGE) on \strong{all} the values of the inputted data set regardless of subject. To calculate separate MAGE values for a group of subjects, use the `mage` function.
 #'
 #' @author Nathaniel J. Fernandes
-#' @details See "mage".
+#' @details
+#' See `mage`.
 #'
 #' @inheritParams CGMS2DayByDay
-#' @param short_ma Integer for period length of the short moving average. \strong{Default: 5.} Must be positive and less than "long_ma". (Recommended <15)
-#' @param long_ma Integer for period length for the long moving average. \strong{Default: 32.} Must be positive and greater than "short_ma". (Recommended >20)
-#' @param return_type One of "num" or "df". \strong{Default: "num".} Will return either a single number for the "MAGE over the entire trace" (weighted by segment length) or a DataFrame with the MAGE value for each segment (see the MAGE vignette for discussion of handling gaps by splitting trace into multiple segments).
-#' @param direction One of "avg", "service", "max", "plus", or "minus". \strong{Default: "avg".} Algorithm will calculate one of the following: MAGE+ (nadir to peak), MAGE- (peak to nadir), MAGEavg = avg(MAGE+, MAGE-), MAGEmax = max(MAGE+, MAGE-), or automatically choose MAGE+/MAGE- based on the first countable excursion (i.e., "service"). NOTE: the selection of peak-to-nadir or nadir-to-peak is chosen independently on each segment, thus MAGEservice may choose peak-to-nadir on one segment and nadir-to-peak on another, for example.
-#' @param plot Boolean. \strong{Default: FALSE.} If TRUE, returns a plot that visualizes all identified peaks and nadirs, excursions, and  missing gaps. An interactive GUI can be loaded with \code{plot_type = 'plotly'}.
-#' @param plot_type One of "ggplot" or "plotly". \strong{Default: "gglplot".} Returns either a ggplot (static image) or Plotly chart (interactive GUI).
-#' @param max_gap Integer for the maximum length of a gap in minutes before the trace is split into segments and MAGE is calculated on each segment independently. \strong{Default: 180.}
-#' @param title Title for the ggplot. \strong{Default: "Glucose Trace - Subject [ID]".}
-#' @param xlab Label for x-axis of ggplot. \strong{Default: "Time".}
-#' @param ylab Label for y-axis of ggplot. \strong{Default: "Glucose Level".}
-#' @param show_ma Boolean. \strong{Default: FALSE.} If TRUE, plots the moving average lines on the plot.
-#' @param show_excursions Boolean. \strong{Default: TRUE.} If TRUE, shows identified excursions as arrows from peak-to-nadir/nadir-to-peak on the plot.
+#' @param short_ma \strong{Default: 5.} Integer for period length of the short moving average. Must be positive and less than `long_ma`. (Recommended <15)
+#' @param long_ma \strong{Default: 32.} Integer for period length for the long moving average. Must be positive and greater than `short_ma`. (Recommended >20)
+#' @param return_type \strong{Default: "num".} One of ("num", "df"). Will return either a single number for the "MAGE over the entire trace" (weighted by segment length) or a DataFrame with the MAGE value for each segment (see the MAGE vignette for discussion of handling large gaps by splitting trace into multiple segments).
+#' @param direction \strong{Default: "avg".} One of ("avg", "service", "max", "plus", or "minus"). Algorithm will calculate one of the following: MAGE+ (nadir to peak), MAGE- (peak to nadir), MAGEavg = avg(MAGE+, MAGE-), MAGEmax = max(MAGE+, MAGE-), or automatically choose MAGE+/MAGE- based on the first countable excursion (i.e., "service"). NOTE: the selection of peak-to-nadir or nadir-to-peak is chosen independently on each segment, thus MAGEservice may choose peak-to-nadir on one segment and nadir-to-peak on another, for example.
+#' @param plot \strong{Default: FALSE.} Boolean. If `TRUE`, returns a plot that visualizes all identified peaks and nadirs, excursions, and  missing gaps. An interactive GUI can be loaded with `static_or_gui = 'plotly'`.
+#' @param static_or_gui \strong{Default: "plotly".} One of "ggplot" or "plotly". Returns either a ggplot (static image) or Plotly chart (interactive GUI).
+#' @param max_gap \strong{Default: 180.} Integer for the maximum length of a gap in minutes before the trace is split into segments and MAGE is calculated on each segment independently.
+#' @param title  \strong{Default: "Glucose Trace - Subject [ID]".} Title for the ggplot.
+#' @param xlab \strong{Default: "Time".} Label for x-axis of ggplot.
+#' @param ylab \strong{Default: "Glucose Level".} Label for y-axis of ggplot.
+#' @param show_ma \strong{Default: FALSE.} Boolean. If TRUE, plots the moving average lines on the plot.
+#' @param show_excursions \strong{Default: TRUE.} Boolean. If TRUE, shows identified excursions as arrows from peak-to-nadir/nadir-to-peak on the plot.
 #'
-#' @return A ggplot or Plotly chart if \code{plot = TRUE}, depending on \code{plot_type}. Otherwise, a numeric MAGE value for the inputted glucose trace or a DataFrame with the MAGE values on each segment, depending on \code{return_type}.
+#' @return A ggplot or Plotly chart if \code{plot = TRUE}, depending on \code{static_or_gui}. Otherwise, a numeric MAGE value for the inputted glucose trace or a DataFrame with the MAGE values on each segment, depending on \code{return_type}.
 #'
 #' @export
 #'
@@ -38,6 +39,7 @@
 #' mage_ma_single(
 #'    example_data_1_subject,
 #'    plot=TRUE,
+#'    static_or_gui='ggplot',
 #'    title="Patient X",
 #'    xlab="Time",
 #'    ylab="Glucose Level (mg/dL)",
@@ -47,17 +49,17 @@ mage_ma_single <- function(data,
                            short_ma = 5, long_ma = 32,
                            return_type = c('num', 'df'),
                            direction = c('avg', 'service', 'max', 'plus', 'minus'),
-                           dt0 = NULL, tz = "", inter_gap = 45,
+                           tz = "", inter_gap = 45,
                            max_gap = 180,
                            plot = FALSE, title = NA, xlab = NA, ylab = NA, show_ma = FALSE, show_excursions = TRUE,
-                           plot_type=c('ggplot','plotly')) {
+                           static_or_gui=c('plotly', 'ggplot')) {
 
   ## pre-0. Turn all tibbles --> DataFrame
   data = as.data.frame(data)
 
   ## 0. Calculates MAGE on 1 segment of CGM trace
   mage_atomic <- function(.data) {
-    nmeasurements = list_cross = types = count = crosses = num_extrema = minmax = indexes = s1 = s2 = standardD = heights = nadir2peak = idx = peak_or_nadir = plus_or_minus = first_excursion = NULL
+    nmeasurements = list_cross = types = count = crosses = num_extrema = minmax = indexes = s1 = s2 = standardD = heights = nadir2peak = idx = peak_or_nadir = plus_or_minus = first_excursion = max_direction = NULL
     rm(list=c('nmeasurements', 'list_cross', 'types', 'count', 'crosses', 'num_extrema', 'minmax', 'indexes', 's1', 's2', 'standardD', 'heights', 'nadir2peak', 'idx', 'peak_or_nadir', 'plus_or_minus', 'first_excursion'))
 
     if (all(is.na(.data$gl))) {
@@ -224,35 +226,37 @@ mage_ma_single <- function(data,
       return(data.frame(start=utils::head(.data$time, 1), end=utils::tail(.data$time, 1), mage=NA, plus_or_minus=NA, first_excursion=NA))
     }
 
-    plus_first = ifelse((length(mage_plus_heights) > 0) && (length(mage_minus_heights) == 0 || mage_plus_tp_pairs[[1]][2] <= mage_minus_tp_pairs[[1]][1]), TRUE, FALSE)
-    mage_plus = data.frame(start=utils::head(.data$time, 1), end=utils::tail(.data$time, 1),  mage=ifelse(length(mage_plus_heights), mean(mage_plus_heights, na.rm = TRUE), NA), plus_or_minus="PLUS", first_excursion=plus_first)
-    mage_minus = data.frame(start=utils::head(.data$time, 1), end=utils::tail(.data$time, 1), mage=ifelse(length(mage_minus_heights), abs(mean(mage_minus_heights, na.rm = TRUE)), NA), plus_or_minus="MINUS", first_excursion=!plus_first)
+    is_plus_first = ifelse((length(mage_plus_heights) > 0) && (length(mage_minus_heights) == 0 || mage_plus_tp_pairs[[1]][2] <= mage_minus_tp_pairs[[1]][1]), TRUE, FALSE)
+    mage_plus = data.frame(start=utils::head(.data$time, 1), end=utils::tail(.data$time, 1),  mage=ifelse(length(mage_plus_heights), mean(mage_plus_heights, na.rm = TRUE), NA), plus_or_minus="PLUS", first_excursion=is_plus_first)
+    mage_minus = data.frame(start=utils::head(.data$time, 1), end=utils::tail(.data$time, 1), mage=ifelse(length(mage_minus_heights), abs(mean(mage_minus_heights, na.rm = TRUE)), NA), plus_or_minus="MINUS", first_excursion=!is_plus_first)
+    is_plus_max = ifelse(mage_plus$mage >= mage_minus$mage, TRUE, FALSE)
 
     # save data for plotting
     pframe = parent.frame()
     pframe$all_data = base::rbind(pframe$all_data, .data)
 
     for (e in mage_plus_tp_pairs) {
-      pframe$all_tp_indexes = base::rbind(pframe$all_tp_indexes, data.frame(idx=indexes[e[1]], peak_or_nadir="NADIR", plus_or_minus="PLUS", first_excursion=plus_first))
-      pframe$all_tp_indexes = base::rbind(pframe$all_tp_indexes, data.frame(idx=indexes[e[2]], peak_or_nadir="PEAK", plus_or_minus="PLUS", first_excursion=plus_first))
+      pframe$all_tp_indexes = base::rbind(pframe$all_tp_indexes, data.frame(idx=indexes[e[1]], peak_or_nadir="NADIR", plus_or_minus="PLUS", first_excursion=is_plus_first, max_direction=is_plus_max))
+      pframe$all_tp_indexes = base::rbind(pframe$all_tp_indexes, data.frame(idx=indexes[e[2]], peak_or_nadir="PEAK", plus_or_minus="PLUS", first_excursion=is_plus_first, max_direction=is_plus_max))
     }
 
     for (e in mage_minus_tp_pairs) {
-      pframe$all_tp_indexes = base::rbind(pframe$all_tp_indexes, data.frame(idx=indexes[e[1]], peak_or_nadir="PEAK", plus_or_minus="MINUS", first_excursion=!plus_first))
-      pframe$all_tp_indexes = base::rbind(pframe$all_tp_indexes, data.frame(idx=indexes[e[2]], peak_or_nadir="NADIR", plus_or_minus="MINUS", first_excursion=!plus_first))
+      pframe$all_tp_indexes = base::rbind(pframe$all_tp_indexes, data.frame(idx=indexes[e[1]], peak_or_nadir="PEAK", plus_or_minus="MINUS", first_excursion=!is_plus_first, max_direction=!is_plus_max))
+      pframe$all_tp_indexes = base::rbind(pframe$all_tp_indexes, data.frame(idx=indexes[e[2]], peak_or_nadir="NADIR", plus_or_minus="MINUS", first_excursion=!is_plus_first, max_direction=!is_plus_max))
     }
 
     return(base::rbind(mage_plus, mage_minus))
   }
 
   ## 1. Preprocessing
-  MA_Short = MA_Long = DELTA_SHORT_LONG = TP = id = .xmin = .xmax = gap = x = y = xend = yend = hours = weight = idx = peak_or_nadir = plus_or_minus = first_excursion = NULL
+  MA_Short = MA_Long = DELTA_SHORT_LONG = TP = id = .xmin = .xmax = gap = x = y = xend = yend = hours = weight = idx = peak_or_nadir = plus_or_minus = first_excursion = max_direction = NULL
   rm(list = c("MA_Short", "MA_Long", "DELTA_SHORT_LONG", "TP", ".xmin", ".xmax", "id", "gap", "x", "y", "xend", "yend", "hours", "weight", "idx", "peak_or_nadir", "plus_or_minus", "first_excursion"))
 
   data = check_data_columns(data)
 
   # 1.1 Interpolate over uniform grid
-  data_ip <- CGMS2DayByDay(data, dt0 = dt0, inter_gap = inter_gap, tz = tz)
+  # Note: always interpolate to 5 minute grid
+  data_ip <- CGMS2DayByDay(data, dt0 = 5, inter_gap = inter_gap, tz = tz)
   day_one = lubridate::as_datetime(data_ip$actual_dates[1])
   ndays = length(data_ip$actual_dates)
 
@@ -370,16 +374,14 @@ mage_ma_single <- function(data,
   if(plot) {
     # 6.1 Label 'Peaks' and 'Nadirs'
     direction = match.arg(direction, c('avg', 'service', 'max', 'plus', 'minus'))
-    plot_type = match.arg(plot_type, c('ggplot', 'plotly'))
+    static_or_gui = match.arg(static_or_gui, c('ggplot', 'plotly'))
 
-    if (direction == "max") {
-      stop("Plotting functionality for MAGEmax is not possible right now. Please request this feature on GitHub if you'd like it. Thank you for your patience.")
-    }
-
-    if (direction == "avg") {
+    if (direction == 'avg') {
       tp_indexes <- dplyr::select(all_tp_indexes, idx, peak_or_nadir, plus_or_minus)
     } else if (direction == 'service') {
       tp_indexes <- dplyr::filter(all_tp_indexes, first_excursion==TRUE) %>% dplyr::select(idx, peak_or_nadir, plus_or_minus)
+    } else if (direction == 'max') {
+      tp_indexes <- dplyr::filter(all_tp_indexes, max_direction==TRUE) %>% dplyr::select(idx, peak_or_nadir, plus_or_minus)
     } else {
       tp_indexes <- dplyr::filter(all_tp_indexes, plus_or_minus==ifelse(direction == 'plus', "PLUS", "MINUS")) %>% dplyr::select(idx, peak_or_nadir, plus_or_minus)
     }
@@ -451,7 +453,7 @@ mage_ma_single <- function(data,
       arrows = rbind(arrows, minus %>% dplyr::filter(peak_or_nadir == "PEAK") %>% dplyr::select(x = time, xend = time, y = gl) %>% dplyr::mutate(yend = base::subset(minus, peak_or_nadir == "NADIR")$gl))
 
       # plotly does not support rendering arrows by default - we use a workaround below (see ~line 487 when we return the plot)
-      if (plot_type == "ggplot") {
+      if (static_or_gui == "ggplot") {
         if (nrow(arrows) > 0) {
           .p <- .p + ggplot2::geom_segment(data = arrows, ggplot2::aes(x = x, y = y, xend = xend, yend = yend, color="Excursion"), arrow = grid::arrow(length = grid::unit(0.2, "cm")))
         }
@@ -473,8 +475,8 @@ mage_ma_single <- function(data,
       .p <- .p + ggplot2::geom_rect(data=.gaps, ggplot2::aes(
         xmin=.xmin,
         xmax=.xmax,
-        ymin= ifelse(plot_type == "plotly", .ymin, -Inf),
-        ymax= ifelse(plot_type == "plotly", .ymax, Inf),
+        ymin= ifelse(static_or_gui == "plotly", .ymin, -Inf),
+        ymax= ifelse(static_or_gui == "plotly", .ymax, Inf),
         fill = 'Gap'
       ),
       alpha=0.2, inherit.aes = FALSE, show.legend = T, na.rm = TRUE) +
@@ -487,7 +489,7 @@ mage_ma_single <- function(data,
     }
 
     # 4d. Return plot
-    if (plot_type == 'plotly') {
+    if (static_or_gui == 'plotly') {
       .p <- plotly::ggplotly(.p)
 
       if (show_excursions == TRUE && nrow(arrows) > 0) {

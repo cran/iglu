@@ -23,24 +23,24 @@ glucose over the past 15 minutes divided by 15.}
 A tibble object with two columns: subject id and rate of change values
 }
 \description{
-The function roc produces rate of change values in a tibble object.
+The function \code{roc} produces rate of change values in a tibble object.
 }
 \details{
 A tibble object with a column for subject id and a column for ROC values is
 returned. A ROC value is returned for each time point for all the subjects. Thus
 multiple rows are returned for each subject. If the rate of change cannot be
-calculated, the function will return NA for that point.
+calculated, the function will return \code{NA} for that point.
 
 The glucose values are linearly interpolated over a time grid starting at the
 beginning of the first day of data and ending on the last day of data. Because
-of this, there may be many NAs at the beginning and the end of the roc values
-for each subject. These NAs are a result of interpolated time points that do
+of this, there may be many \code{NA}s at the beginning and the end of the roc values
+for each subject. These \code{NA}s are a result of interpolated time points that do
 not have recorded glucose values near them because recording had either not
 yet begun for the day or had already ended.
 
-The ROC is calculated as \eqn{\frac{BG(t_i) - BG(t_{i-1})}{t_i - t_{i-1}}}
-where BG_i is the Blood Glucose measurement at time \eqn{t_i} and \eqn{BG_{i-1}} is the
-Blood Glucose measurement at time \eqn{t_{i-1}}. The time difference between the points,
+The ROC is calculated as \eqn{\frac{G(t_i) - G(t_{i-1})}{t_i - t_{i-1}}}
+where \eqn{G_i} is the Glucose measurement at time \eqn{t_i} and \eqn{G_{i-1}} is the
+Glucose measurement at time \eqn{t_{i-1}}. The time difference between the points,
 \eqn{t_i - t_{i-1}}, is selectable and set at a default of 15 minutes.
 }
 \examples{

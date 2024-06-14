@@ -1,3 +1,24 @@
+# iglu 4.1.6
+* Updates to the MAGE vignette
+* Minor documentation updates
+
+# iglu 4.1.5
+* Updates to the MAGE vignette
+* In MAGE function, linearly interpolate data to 5 min intervals using CGMS2DayByDay
+
+# iglu 4.1.1
+* Breaking change: changed parameter `plot_type` in iglu::mage, iglu::mage_ma_single to `static_or_cgm`
+* Added plotly functionality to `plot_glu()` and the lasagna plots
+* Updated author ids
+* Fixed formatting issues in the documentation
+
+# iglu 4.1.0
+* Add meal plotting functionality
+
+# iglu 4.0.2
+* Fixed broken whiplash plot in MAGE documentation
+* Added MAGEmax plotting functionality
+
 # iglu 4.0.0
 * CRAN release to match upcoming paper summarizing updated MAGE algorithm, episode calculation functionality, meal metrics, clustering and new example data inclusion
 

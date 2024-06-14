@@ -32,11 +32,22 @@ mage(fig2data, plot = TRUE, title = "Glucose Trace with Gaps - Subject 1")
 knitr::include_graphics("mage_figures/hyper-param-tuning.png")
 
 ## ----echo=FALSE, fig.width=10, fig.height=7, out.width="700px", out.height ="400px"----
-knitr::include_graphics("mage_figures/boxplot-of-errors.png")
+knitr::include_graphics("mage_figures/boxplot-of-errors2.png")
+
+## ----echo=FALSE---------------------------------------------------------------
+load('./mage_figures/correlation_matrix.rda')
+knitr::kable(corr_matrix, digits=2)
+
+## ----echo=FALSE, fig.width=10, fig.height=7, out.width="700px", out.height ="400px"----
+knitr::include_graphics("mage_figures/correlation_matrix.png")
+
+## ----echo=FALSE---------------------------------------------------------------
+load('./mage_figures/corr_matrix_basic.rda')
+knitr::kable(corr_matrix_basic, digits=2)
 
 ## ----echo=FALSE, fig.width=10, fig.height=7, out.width="700px", out.height ="400px"----
 knitr::include_graphics("mage_figures/whiplash1.png")
 
 ## ----echo=FALSE, fig.width=10, fig.height=7, out.width="700px", out.height ="400px"----
-knitr::include_graphics("mage_figures/boxplot-of-errors.png")
+knitr::include_graphics("mage_figures/whiplash2.png")
 
