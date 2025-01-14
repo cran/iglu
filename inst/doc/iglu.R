@@ -23,13 +23,13 @@ dim(example_data_5_subject)
 str(example_data_5_subject)
 
 ## ----eval=FALSE---------------------------------------------------------------
-#  read_raw_data("mydexcomdata.csv", sensor = "dexcom", id = "read")
+# read_raw_data("mydexcomdata.csv", sensor = "dexcom", id = "read")
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  process_data(example_data_5_subject, id = "id", timestamp = "time", glu = "gl")
+# process_data(example_data_5_subject, id = "id", timestamp = "time", glu = "gl")
 
 ## ----eval = FALSE-------------------------------------------------------------
-#  process_data(data, id = "id", timestamp = "time", glu = "gl", time_parser = function(time_string) {strptime(time_string, format = "%d/%m/%Y %H:%M")})
+# process_data(data, id = "id", timestamp = "time", glu = "gl", time_parser = function(time_string) {strptime(time_string, format = "%d/%m/%Y %H:%M")})
 
 ## -----------------------------------------------------------------------------
 above_percent(example_data_1_subject)
@@ -50,7 +50,7 @@ str(CGMS2DayByDay(example_data_1_subject))
 str(CGMS2DayByDay(example_data_1_subject, dt0 = 10))
 
 ## ----eval = F-----------------------------------------------------------------
-#  CGMS2DayByDay(example_data_1_subject, tz = 'EST')
+# CGMS2DayByDay(example_data_1_subject, tz = 'EST')
 
 ## ----cache = T----------------------------------------------------------------
 conga(example_data_1_subject, tz = 'EST')

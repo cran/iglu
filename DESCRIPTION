@@ -1,7 +1,7 @@
 Package: iglu
 Type: Package
 Title: Interpreting Glucose Data from Continuous Glucose Monitors
-Version: 4.2.0
+Version: 4.2.2
 Authors@R: c(person("Elizabeth", "Chun",
             role = c("aut")),
             person("Steve", "Broll",
@@ -52,7 +52,7 @@ URL: https://irinagain.github.io/iglu/
 BugReports: https://github.com/irinagain/iglu/issues
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2024-10-15 14:07:33 UTC; irinagn
+Packaged: 2025-01-14 17:48:43 UTC; irinagn
 Author: Elizabeth Chun [aut],
   Steve Broll [aut],
   David Buchanan [aut],
@@ -70,4 +70,4 @@ Author: Elizabeth Chun [aut],
   Irina Gaynanova [aut, cre] (<https://orcid.org/0000-0002-4116-0268>)
 Maintainer: Irina Gaynanova <irinagn@umich.edu>
 Repository: CRAN
-Date/Publication: 2024-10-15 22:00:06 UTC
+Date/Publication: 2025-01-14 22:30:05 UTC
